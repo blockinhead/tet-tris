@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3 uid="uid://ce74r14w67adb"]
+
+[ext_resource type="Script" path="res://Objects/sounds.gd" id="1_sjtmi"]
+[ext_resource type="AudioStream" uid="uid://b3sppmeasfb5h" path="res://Assets/sounds/mixkit-arcade-game-jump-coin-216.ogg" id="2_31yy6"]
+[ext_resource type="AudioStream" uid="uid://t6pjlaxbxogt" path="res://Assets/sounds/mixkit-click-melodic-tone-1129.ogg" id="3_rs2ps"]
+[ext_resource type="AudioStream" uid="uid://c5ylv5f060dp5" path="res://Assets/sounds/mixkit-gate-latch-click-1924.ogg" id="4_ejej3"]
+[ext_resource type="AudioStream" uid="uid://b5cfg68x48dlt" path="res://Assets/sounds/mixkit-opening-software-interface-2578.ogg" id="5_4y00n"]
+
+[node name="Sounds" type="Node"]
+script = ExtResource("1_sjtmi")
+
+[node name="Turn" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_31yy6")
+
+[node name="Drop" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_rs2ps")
+
+[node name="Move" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_ejej3")
+
+[node name="RemoveLine" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_4y00n")

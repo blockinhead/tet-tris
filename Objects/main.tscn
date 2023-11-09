@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://brfgq0ogtfo5a"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_rwrko"]
+[ext_resource type="PackedScene" uid="uid://ce74r14w67adb" path="res://Objects/sounds.tscn" id="2_4c6hi"]
+[ext_resource type="PackedScene" uid="uid://kp42duyo715c" path="res://Objects/GameOver.tscn" id="2_bevyu"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_rwrko")
+
+[node name="Sounds" parent="." instance=ExtResource("2_4c6hi")]
+
+[node name="GameOver" parent="." instance=ExtResource("2_bevyu")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+offset_left = 780.0
+offset_top = 64.0
+offset_right = 1045.0
+offset_bottom = 481.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "next"
+
+[node name="NextFigure" type="PanelContainer" parent="CanvasLayer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="Score" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "score"
+
+[node name="Speed" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "00.00"
