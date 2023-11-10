@@ -7,9 +7,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name : "Upload to GitHub pages"
+    - name: "Checkout"
       uses: actions/checkout@v3.0.2    
+    - name: "Upload to GitHub pages" 
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
         branch: gh-pages
-        folder: export/web    
+        folder: export/web
+        
