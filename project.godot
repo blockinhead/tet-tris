@@ -15,6 +15,14 @@ run/main_scene="res://Objects/main.tscn"
 config/features=PackedStringArray("4.1", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[display]
+
+window/stretch/mode="viewport"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/coi_serviceworker/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
