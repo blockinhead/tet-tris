@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bschf41b5mo0h"]
+
+[ext_resource type="Script" path="res://Objects/next_figure.gd" id="1_yf2vb"]
+
+[node name="NextFigure" type="Node2D"]
+script = ExtResource("1_yf2vb")

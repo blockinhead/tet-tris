@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://brfgq0ogtfo5a"]
+[gd_scene load_steps=5 format=3 uid="uid://brfgq0ogtfo5a"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_rwrko"]
 [ext_resource type="PackedScene" uid="uid://ce74r14w67adb" path="res://Objects/sounds.tscn" id="2_4c6hi"]
 [ext_resource type="PackedScene" uid="uid://kp42duyo715c" path="res://Objects/GameOver.tscn" id="2_bevyu"]
+[ext_resource type="PackedScene" uid="uid://bschf41b5mo0h" path="res://Objects/next_figure.tscn" id="4_y0qxi"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_rwrko")
@@ -24,10 +25,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "next"
 
-[node name="NextFigure" type="PanelContainer" parent="CanvasLayer/VBoxContainer"]
-visible = false
-custom_minimum_size = Vector2(0, 150)
+[node name="NextFigureContainer" type="PanelContainer" parent="CanvasLayer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
+
+[node name="NextFigure" parent="CanvasLayer/VBoxContainer/NextFigureContainer" instance=ExtResource("4_y0qxi")]
 
 [node name="Score" type="Label" parent="CanvasLayer/VBoxContainer"]
 layout_mode = 2

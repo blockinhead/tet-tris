@@ -1,21 +1,20 @@
 extends Node2D
 
-var brick: PackedScene = preload("res://Objects/brick.tscn")
+
 
 const glass_height = 18
 const glass_width = 10
 const spawn_point = Vector2(glass_width / 2, 3)
+const offset = Vector2(80, 80)
 
-const cell_step = 40
-const cell_size = Vector2(cell_step / 2, cell_step / 2)
-const cell_size_bordered = cell_size * 0.9
 var current_figure: Array[Vector2]
+var next_figure: Array
 var glass: Array
 var update_timer = Timer.new()
 var max_wait_time = 0.6
-var min_wait_time = 0.2
+var min_wait_time = 0.15
 var wait_time_step = 0.01
-var min_fast_time = 3
+var min_fast_time = 6
 var current_fast_time = min_fast_time
 var general_timer = Timer.new()
 
@@ -24,16 +23,17 @@ var score = 0: set = update_score
 var moving_down = false
 var is_game_over = true
 
+@onready var NextFigure := $CanvasLayer/VBoxContainer/NextFigureContainer/NextFigure
+@onready var ScoreWidget := $CanvasLayer/VBoxContainer/Score
+@onready var SpeedWidget := $CanvasLayer/VBoxContainer/Speed
+@onready var GameOver := $GameOver
+@onready var SoundController := $Sounds
 
-func  update_score(val: int):
+
+func update_score(val: int):
 	score = val
-	$CanvasLayer/VBoxContainer/Score.text = 'score: %04d' % val
+	ScoreWidget.text = 'score: %04d' % val
 
-
-func game_to_screen(pos: Vector2) -> Vector2:
-	var offset = Vector2(100, 100)
-	return (pos * cell_size) + offset
-	
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -47,11 +47,10 @@ func _ready():
 	general_timer.wait_time = 1
 	add_child(general_timer)
 	
-	$GameOver.NewGamePressed.connect(new_game)
+	GameOver.NewGamePressed.connect(new_game)
 	
 	new_game()
 	
-	preview_figure()
 	
 func update_update_timer():
 	update_timer.wait_time = max(update_timer.wait_time - wait_time_step, min_wait_time)
@@ -62,16 +61,15 @@ func update_update_timer():
 		update_timer.wait_time = max_wait_time
 		current_fast_time = min_fast_time
 		
-	$CanvasLayer/VBoxContainer/Speed.text = 'speed: %03.2f' % update_timer.wait_time
+	SpeedWidget.text = 'speed: %03.2f' % update_timer.wait_time
 		
 	
 	
 func new_game():
-	$GameOver.hide()
-	# game_over()
-	# return
+	GameOver.hide()
 	current_figure.clear()
 	_init_glass()
+	next_figure = _get_figure()
 	_spawn_figure()
 	update_timer.start()
 	general_timer.start()
@@ -103,20 +101,14 @@ func _init_glass():
 		glass.append(row)
 
 func brick_from_glass(pos: Vector2):
-	# if glass[pos.y][pos.x] == null:
-	# 	return false
 	return glass[pos.y][pos.x]
 
 
 		
 func _draw_brick(pos: Vector2, color = Color.ANTIQUE_WHITE):
 	assert(glass[pos.y][pos.x] == null, 'attempting to draw on nonvacant position')
-	var b = brick.instantiate();
+	var b = Global.draw_brick(pos, color, offset)
 	add_child(b)
-	b.modulate = color
-	b.position = game_to_screen(pos)
-	b.scale = cell_size_bordered
-	
 	if pos.y >= 0:
 		glass[pos.y][pos.x] = b
 		
@@ -132,17 +124,14 @@ func move_bricks(old_poses: Array, new_poses: Array):
 
 	for i in range(l):
 		assert(brick_from_glass(new_poses[i]) == null, 'moving brick to nonvacant position')
-		tmp[i].position = game_to_screen(new_poses[i])
+		tmp[i].position = Global.game_to_screen(new_poses[i]) + offset
 		glass[new_poses[i].y][new_poses[i].x] = tmp[i]
 
 func _draw_walls(height=glass_height, width=glass_width):
 	var color = Color.ANTIQUE_WHITE
 	var draw_brick = func (pos):
-		var b = brick.instantiate();
+		var b = Global.draw_brick(pos, color, offset)
 		add_child(b)
-		b.modulate = color
-		b.position = game_to_screen(pos)
-		b.scale = cell_size_bordered
 
 	for i in range(height + 1):
 		draw_brick.call(Vector2(-1, i))
@@ -160,13 +149,13 @@ func _process(delta):
 	if Input.is_action_just_pressed('ui_up'):
 		var next_state = _rotate_figure()
 		if check(next_state):
-			$Sounds.turn()
+			SoundController.turn()
 			redraw_figure(next_state)
 			
 	elif Input.is_action_just_pressed('ui_down'):
 		moving_down = true
 	elif Input.is_action_pressed('ui_down') and moving_down:
-		$Sounds.drop()
+		SoundController.drop()
 		update_state()
 	elif Input.is_action_just_released("ui_down"):
 		moving_down = false
@@ -174,12 +163,12 @@ func _process(delta):
 	elif Input.is_action_just_pressed('ui_left'):
 		var next_state = shift(Vector2.LEFT)
 		if check(next_state):
-			$Sounds.move()
+			SoundController.move()
 			redraw_figure(next_state)
 	elif Input.is_action_just_pressed('ui_right'):
 		var next_state = shift(Vector2.RIGHT)
 		if check(next_state):
-			$Sounds.move()
+			SoundController.move()
 			redraw_figure(next_state)
 		
 
@@ -232,7 +221,10 @@ func _get_figure():
 	
 func _spawn_figure():
 	current_figure = []
-	var _f = _get_figure()
+	# var _f = _get_figure()
+	var _f = next_figure
+	next_figure = _get_figure()
+	NextFigure.draw_figure(next_figure[0], next_figure[1])
 	var next_state: Array[Vector2] = []
 	for p in _f[0]:
 		next_state.append(p + spawn_point)
@@ -323,8 +315,7 @@ func remove_full():
 	var current_row = glass_height - 1
 	while current_row >= 0:
 		if is_row_full(current_row):
-			# print('row %d is full' % current_row)
-			$Sounds.remove_line()
+			SoundController.remove_line()
 			num_removed += 1
 			remove_full_row(current_row)
 			for i in range(current_row - 1, 0, -1):
@@ -339,12 +330,5 @@ func game_over():
 	is_game_over = true
 	update_timer.stop()
 	general_timer.stop()
-	$GameOver.show()
+	GameOver.show()
 
-func preview_figure():
-	var b = brick.instantiate();
-	$CanvasLayer/VBoxContainer/NextFigure.add_child(b)
-	b.modulate = Color.ANTIQUE_WHITE
-	b.position = game_to_screen(Vector2(0, 0))
-	b.scale = cell_size_bordered
-	
