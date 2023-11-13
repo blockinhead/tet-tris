@@ -14,8 +14,9 @@ var update_timer = Timer.new()
 var max_wait_time = 0.6
 var min_wait_time = 0.15
 var wait_time_step = 0.01
-var min_fast_time = 6
-var current_fast_time = min_fast_time
+var fast_time = 6
+var fast_time_increase_delta = 0.4
+var current_fast_time = fast_time
 var general_timer = Timer.new()
 
 var score = 0: set = update_score
@@ -59,9 +60,10 @@ func update_update_timer():
 		
 	if current_fast_time < 0:
 		update_timer.wait_time = max_wait_time
-		current_fast_time = min_fast_time
+		fast_time += fast_time_increase_delta
+		current_fast_time = fast_time
 		
-	SpeedWidget.text = 'speed: %03.2f' % update_timer.wait_time
+	SpeedWidget.text = 'update time: %03.2f' % update_timer.wait_time
 		
 	
 	
